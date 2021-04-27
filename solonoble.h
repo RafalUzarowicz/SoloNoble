@@ -2,6 +2,11 @@
 #define SOLONOBLE_H
 
 #include <QMainWindow>
+#include <QTextEdit>
+#include <QLabel>
+#include <QPushButton>
+#include "board.h"
+#include "boardview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SoloNoble; }
@@ -17,5 +22,6 @@ public:
 
 private:
     Ui::SoloNoble *ui;
+    Board* board;
 };
 #endif // SOLONOBLE_H

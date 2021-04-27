@@ -32,6 +32,14 @@ set(PROJECT_SOURCES
         solonoble.cpp
         solonoble.h
         solonoble.ui
+        board.cpp
+        board.h
+        settings.cpp
+        settings.h
+        boardview.cpp
+        boardview.h
+        hole.cpp
+        hole.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
