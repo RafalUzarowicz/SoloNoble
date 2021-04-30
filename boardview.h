@@ -8,15 +8,10 @@ class BoardView : public QGraphicsView
 public:
     BoardView(QWidget* = nullptr);
 
-    void zoomToFit()
-    {
-        fitInView(scene()->sceneRect(), Qt::KeepAspectRatio);
-    }
+    void zoomToFit();
 
 protected:
-    void resizeEvent(QResizeEvent* event) override{
-        zoomToFit();
-    }
+    void resizeEvent(QResizeEvent* event) override;
 };
 
 #endif // BOARDVIEW_H

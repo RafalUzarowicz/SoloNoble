@@ -4,7 +4,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsGridLayout>
-#include "pawn.h"
 
 int main(int argc, char *argv[])
 {

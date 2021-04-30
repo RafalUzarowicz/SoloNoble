@@ -4,36 +4,23 @@
 #include <QObject>
 #include <QColor>
 
-class settings : public QObject
+class Settings : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isEuropean READ isEuropean WRITE setEuropean NOTIFY isEuropeanChanged)
     Q_PROPERTY(QColor pawnColor READ pawnColor WRITE setPawnColor NOTIFY pawnColorChanged)
     Q_PROPERTY(QColor boardColor READ boardColor WRITE setBoardColor NOTIFY boardColorChanged)
 public:
-    explicit settings(QObject *parent = nullptr);
+    explicit Settings(QObject* = nullptr);
 
+    void setEuropean(bool);
+    bool isEuropean();
 
-    void setEuropean(bool isEuropean ){
-        m_isEuropean = isEuropean;
-    }
-    bool isEuropean(){
-        return m_isEuropean;
-    }
+    QColor pawnColor();
+    void setPawnColor(QColor);
 
-    QColor pawnColor(){
-        return m_pawnColor;
-    }
-    void setPawnColor(QColor color){
-        m_pawnColor = color;
-    }
-
-    QColor boardColor(){
-        return m_boardColor;
-    }
-    void setBoardColor(QColor color){
-        m_boardColor = color;
-    }
+    QColor boardColor();
+    void setBoardColor(QColor);
 
 signals:
     void isEuropeanChanged(bool);

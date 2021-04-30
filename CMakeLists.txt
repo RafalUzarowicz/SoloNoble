@@ -38,8 +38,11 @@ set(PROJECT_SOURCES
         settings.h
         boardview.cpp
         boardview.h
-        hole.cpp
-        hole.h
+        tile.cpp
+        tile.h
+        settingsdialog.h
+        settingsdialog.cpp
+        settingsdialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

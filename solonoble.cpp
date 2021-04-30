@@ -7,17 +7,24 @@ SoloNoble::SoloNoble(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setWindowTitle("Solo Noble");
+
     board = new Board();
-    board->setBackgroundBrush(Qt::blue);
 
-    BoardView* boardView = new BoardView();
-    boardView->setBackgroundBrush(Qt::red);
-
+    boardView = new BoardView();
     boardView->setScene(board);
 
     ui->centralwidget->layout()->addWidget(boardView);
-    boardView->update();
-//    ui->boardView->setScene(board);
+
+    settingsDialog = new SettingsDialog();
+    settingsDialog->setWindowTitle("Game settings");
+
+    connect(board, &Board::scoreChanged, this, &SoloNoble::updateScore);
+    connect(ui->action_Settings, &QAction::triggered, settingsDialog, &SettingsDialog::show);
+
+    updateScore(board->getScore());
+
+
 }
 
 SoloNoble::~SoloNoble()
@@ -25,3 +32,11 @@ SoloNoble::~SoloNoble()
     delete ui;
 }
 
+void SoloNoble::updateScore(int score){
+    QString message = QString("Pawns left: ") + QString::number(score);
+    ui->statusBar->showMessage(message);
+}
+
+void SoloNoble::newGame(){
+
+}

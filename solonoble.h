@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include "board.h"
 #include "boardview.h"
+#include "settingsdialog.h"
+#include "settings.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SoloNoble; }
@@ -17,11 +19,19 @@ class SoloNoble : public QMainWindow
     Q_OBJECT
 
 public:
-    SoloNoble(QWidget *parent = nullptr);
+    SoloNoble(QWidget* = nullptr);
     ~SoloNoble();
 
 private:
     Ui::SoloNoble *ui;
     Board* board;
+    BoardView* boardView;
+    SettingsDialog* settingsDialog;
+    Settings gameSettings;
+
+public slots:
+    void updateScore(int);
+
+
 };
 #endif // SOLONOBLE_H

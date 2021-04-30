@@ -4,50 +4,51 @@
 #include <QGraphicsScene>
 #include <QGraphicsGridLayout>
 #include <QGraphicsWidget>
-#include "hole.h"
+#include "tile.h"
 
 class Board : public QGraphicsScene
 {
     Q_OBJECT
+
+    Q_PROPERTY(int score READ getScore WRITE setScore NOTIFY scoreChanged)
 public:
     Board(int = 7);
 
 public:
     void resetBoard(bool = false);
 
+    int getScore() const{
+        return score;
+    }
+
+    void setScore(int newScore){
+        score = newScore;
+    }
+
 signals:
     void clearSelection();
+    void scoreChanged(int);
 
 public slots:
-    void newTileSelected(Hole* newTile){
-        disconnect(this, &Board::clearSelection, newTile, &Hole::deselect);
-        emit clearSelection();
-        connect(this, &Board::clearSelection, newTile, &Hole::deselect);
-    }
-
-    void removePawns(int target, int source){
-        int x1 = target%boardSize;
-        int y1 = target/boardSize;
-        int x2 = source%boardSize;
-        int y2 = source/boardSize;
-
-        int betweenX = (x1+x2)/2;
-        int betweenY = (y1+y2)/2;
-
-        Hole* pawn = (Hole*)layout->itemAt(boardSize*betweenY + betweenX);
-        pawn->removePawn();
-
-        pawn = (Hole*)layout->itemAt(boardSize*y2 + x2);
-        pawn->removePawn();
-    }
+    void newTileSelected(Tile*);
+    void removePawns(int, int);
+    void updateScore();
 
 private:
     void initialBoard();
+    void connectPawns(Tile*, Tile*, Tile*, bool);
+    bool isGameEnding();
+
+    inline bool isMovePossible(Tile*, Tile*, Tile*) const;
 
     QGraphicsGridLayout *layout;
+    QGraphicsWidget *form;
     void setNeighboursConnection();
     bool isTileOnBoard(const int&, const int&, const bool& = false);
     int boardSize;
+    Tile* selectedTile;
+
+    int score;
 };
 
 #endif // BOARD_H
