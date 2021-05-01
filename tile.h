@@ -14,64 +14,62 @@ class Tile : public QObject, public QGraphicsItem, public QGraphicsLayoutItem
 
     friend Board;
 
-public:
-    Tile(int, QGraphicsItem* = nullptr);
+    Q_PROPERTY(QColor pawnColor WRITE setPawnColor)
+    Q_PROPERTY(QColor highlightColor WRITE setHighlightColor)
+    Q_PROPERTY(QColor markColor WRITE setMarkColor)
 
-    QRectF boundingRect() const;
-    QPainterPath shape() const;
+    Q_PROPERTY(bool isOccupied WRITE occupied)
+    Q_PROPERTY(bool isSelected WRITE select)
+    Q_PROPERTY(bool isPossibleMove WRITE mark)
+    Q_PROPERTY(bool isHighlighted WRITE highlight)
+
+    Q_PROPERTY(QVector<Tile*> closeNeighbours READ closeNeighbours)
+    Q_PROPERTY(QVector<Tile*> farNeighbours READ farNeighbours)
+
+public:
+    Tile(QColor = Qt::green, QGraphicsItem* = nullptr);
+
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
     QSizeF sizeHint(Qt::SizeHint, const QSizeF& = QSizeF()) const override;
-    void setGeometry(const QRectF&);
+    void setGeometry(const QRectF&) override;
+
+    QVector<Tile*> closeNeighbours();
+    QVector<Tile*> farNeighbours();
 
 signals:
-    void highlightMoves(bool);
+    void tileHoverChanged(bool);
     void tileSelected(Tile*);
-    void markPossibleMoves(int);
-    void unmarkPossibleMoves(int);
-    void removePawns(int, int);
-
-
-    void startHighlightSetH(bool);
-    void startHighlightSetV(bool);
-    void continueHighlightSetH(bool);
-    void continueHighlightSetV(bool);
-
-    void updateScore();
-
-    void testSignal(bool);
+    void emptyTileSelected(Tile*);
 
 public slots:
-
-    void testSlot(bool);
-    void checkHighlightPossibilityH(bool);
-    void checkHighlightPossibilityV(bool);
-    void highlightTileH(bool);
-    void highlightTileV(bool);
-
-    void deselect();
-    void markMovePossibility(int);
-    void unmarkMovePossibility(int);
+    void setPawnColor(QColor);
+    void setHighlightColor(QColor);
+    void setMarkColor(QColor);
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent*) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent*) override;
     void mousePressEvent(QGraphicsSceneMouseEvent*) override;
 
-
-    void removePawn();
-    void placePawn();
+    void occupied(bool);
+    void select(bool);
+    void highlight(bool);
+    void mark(bool);
 
 private:
-    QColor pawnColor;
-    QColor pawnBackground;
+    QColor m_pawnColor;
+    QColor m_highlightColor;
+    QColor m_markColor;
 
-    bool isSelected;
-    bool isOccupied;
-    bool isPossibleMove;
-    bool isHighlighted;
+    bool m_isOccupied;
+    bool m_isSelected;
+    bool m_isPossibleMove;
+    bool m_isHighlighted;
 
-    int id;
-    int whoWillMove;
+    QVector<Tile*> m_closeNeighbours;
+    QVector<Tile*> m_farNeighbours;
 };
 
 #endif // HOLE_H

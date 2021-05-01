@@ -5,38 +5,44 @@
 #include <QGraphicsGridLayout>
 #include <QGraphicsWidget>
 #include "tile.h"
+#include "settings.h"
+
+class SoloNoble;
 
 class Board : public QGraphicsScene
 {
     Q_OBJECT
 
     Q_PROPERTY(int score READ getScore WRITE setScore NOTIFY scoreChanged)
+    Q_PROPERTY(Settings boardSettings)
 public:
     Board(int = 7);
 
 public:
-    void resetBoard(bool = false);
 
-    int getScore() const{
-        return score;
-    }
+    int getScore() const;
 
-    void setScore(int newScore){
-        score = newScore;
-    }
+    void setScore(int);
 
 signals:
     void clearSelection();
     void scoreChanged(int);
+    void sendGameStateMessage(QString);
 
 public slots:
-    void newTileSelected(Tile*);
-    void removePawns(int, int);
-    void updateScore();
+    void selectNewTile(Tile*);
+    void tryMovingPawn(Tile*);
+    void highlightMoves(bool);
+
+    void resetBoard();
+
+    void changeBoardType(bool);
 
 private:
+    void markMoves(bool);
+    void updateScore();
     void initialBoard();
-    void connectPawns(Tile*, Tile*, Tile*, bool);
+    void createPawnNeighbourhood(Tile*, Tile*, Tile*);
     bool isGameEnding();
 
     inline bool isMovePossible(Tile*, Tile*, Tile*) const;
@@ -44,11 +50,15 @@ private:
     QGraphicsGridLayout *layout;
     QGraphicsWidget *form;
     void setNeighboursConnection();
-    bool isTileOnBoard(const int&, const int&, const bool& = false);
+    bool isTileOnBoard(const int&, const int&);
     int boardSize;
-    Tile* selectedTile;
 
+    Settings m_boardSettings;
+
+    Tile* selectedTile;
     int score;
+
+    friend class SoloNoble;
 };
 
 #endif // BOARD_H

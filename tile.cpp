@@ -1,13 +1,20 @@
 #include "tile.h"
 
-Tile::Tile(int id, QGraphicsItem *parent) : QGraphicsItem(parent), id(id), pawnColor(Qt::green), pawnBackground(Qt::yellow) {
+Tile::Tile(QColor pawnColor, QGraphicsItem *parent) :
+    QGraphicsItem(parent),
+    m_pawnColor(pawnColor),
+    m_highlightColor(Qt::blue),
+    m_markColor(Qt::red),
+    m_isOccupied(true),
+    m_isSelected(false),
+    m_isPossibleMove(false),
+    m_isHighlighted(false) {
+
+    m_closeNeighbours.reserve(4);
+    m_farNeighbours.reserve(4);
+
     setAcceptHoverEvents(true);
     setGraphicsItem(this);
-    isSelected = false;
-    isOccupied = true;
-    isPossibleMove = false;
-    isHighlighted = false;
-    whoWillMove = -1;
 }
 
 QRectF Tile::boundingRect() const {
@@ -21,21 +28,25 @@ QPainterPath Tile::shape() const {
 }
 
 void Tile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget){
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->setBrush(pawnBackground);
-    if(isPossibleMove){
-        painter->setBrush(Qt::red);
-    }else if(isHighlighted){
-        painter->setBrush(Qt::blue);
+
+    if(m_isPossibleMove){
+        painter->setBrush(m_markColor);
+        painter->drawRoundedRect(boundingRect(), 40, 40);
+    }else if(m_isHighlighted){
+        painter->setBrush(m_highlightColor);
+        painter->drawRoundedRect(boundingRect(), 40, 40);
     }
-    painter->drawRoundedRect(boundingRect(), 10, 10);
-    if(isOccupied){
-        if(isSelected){
+    if(m_isOccupied){
+        if(m_isSelected){
             painter->setBrush(Qt::black);
-        }else{
-            painter->setBrush(pawnColor);
+            painter->drawEllipse(boundingRect());
         }
-        painter->drawEllipse(boundingRect());
+        painter->setBrush(m_pawnColor);
+        painter->drawEllipse(boundingRect().center(), 0.9*boundingRect().width()/2, 0.9*boundingRect().height()/2);
     }else{
         painter->setBrush(Qt::black);
         QRectF bRect = boundingRect();
@@ -57,113 +68,66 @@ QSizeF Tile::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const{
     return constraint;
 }
 
-void Tile::setGeometry(const QRectF &geom)
-{
+void Tile::setGeometry(const QRectF &geom){
     prepareGeometryChange();
     QGraphicsLayoutItem::setGeometry(geom);
     setPos(geom.topLeft());
 }
 
-void Tile::testSlot(bool value){
-
+QVector<Tile*> Tile::closeNeighbours(){
+    return m_closeNeighbours;
 }
 
-void Tile::checkHighlightPossibilityH(bool newIsHighlighted){
-    if(isOccupied){
-        emit continueHighlightSetH(newIsHighlighted);
-    }
+QVector<Tile*> Tile::farNeighbours(){
+    return m_farNeighbours;
 }
 
-void Tile::checkHighlightPossibilityV(bool newIsHighlighted){
-    if(isOccupied){
-        emit continueHighlightSetV(newIsHighlighted);
-    }
+void Tile::occupied(bool isOccupied){
+    this->m_isOccupied = isOccupied;
 }
 
-void Tile::highlightTileH(bool newIsHighlighted){
-    if(!isOccupied){
-        isHighlighted = newIsHighlighted;
-        update();
-    }
+void Tile::select(bool isSelected){
+    this->m_isSelected = isSelected;
 }
 
-void Tile::highlightTileV(bool newIsHighlighted){
-    if(!isOccupied){
-        isHighlighted = newIsHighlighted;
-        update();
-    }
+void Tile::highlight(bool isHighlighted){
+    this->m_isHighlighted = isHighlighted;
 }
 
-void Tile::deselect(){
-    isSelected = false;
-    update();
-    emit unmarkPossibleMoves(id);
-}
-
-void Tile::markMovePossibility(int idOfWhoWillMove){
-    if(!isOccupied && isHighlighted){
-        isPossibleMove = true;
-        whoWillMove = idOfWhoWillMove;
-        update();
-    }
-}
-
-void Tile::unmarkMovePossibility(int idOfWhoWillMove){
-    if(!isOccupied){
-        isPossibleMove = false;
-        whoWillMove = idOfWhoWillMove;
-        update();
-    }
+void Tile::mark(bool isPossibleMove){
+    this->m_isPossibleMove = isPossibleMove;
 }
 
 void Tile::hoverEnterEvent(QGraphicsSceneHoverEvent* e){
-    if(isOccupied){
-        emit startHighlightSetH(true);
-        emit startHighlightSetV(true);
-    }
+    emit tileHoverChanged(true);
     QGraphicsItem::hoverEnterEvent(e);
 }
+
 void Tile::hoverLeaveEvent(QGraphicsSceneHoverEvent* e){
-    if(isOccupied){
-        emit startHighlightSetH(false);
-        emit startHighlightSetV(false);
-    }
+    emit tileHoverChanged(false);
     QGraphicsItem::hoverLeaveEvent(e);
 }
 
 void Tile::mousePressEvent(QGraphicsSceneMouseEvent* e){
-    if(isOccupied && !isSelected){
-        isSelected = true;
+    if(m_isOccupied){
         emit tileSelected(this);
-        emit markPossibleMoves(id);
-    }else if(!isOccupied && isPossibleMove){
-        isOccupied = true;
-        isSelected = true;
-        isPossibleMove = false;
-
-        emit removePawns(id, whoWillMove);
-        emit tileSelected(this);
-        emit startHighlightSetH(true);
-        emit startHighlightSetV(true);
-        emit markPossibleMoves(id);
-
-        emit updateScore();
+    }else{
+        emit emptyTileSelected(this);
     }
     QGraphicsItem::mousePressEvent(e);
+}
+
+void Tile::setPawnColor(QColor color){
+    m_pawnColor = color;
     update();
 }
 
-
-void Tile::removePawn(){
-    isOccupied = false;
-    isSelected = false;
-    isPossibleMove = false;
+void Tile::setHighlightColor(QColor color){
+    m_highlightColor = color;
     update();
 }
 
-void Tile::placePawn(){
-    isOccupied = true;
-    isSelected = false;
-    isPossibleMove = false;
+void Tile::setMarkColor(QColor color){
+    m_markColor = color;
     update();
 }

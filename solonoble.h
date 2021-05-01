@@ -27,11 +27,11 @@ private:
     Board* board;
     BoardView* boardView;
     SettingsDialog* settingsDialog;
-    Settings gameSettings;
 
 public slots:
     void updateScore(int);
-
+    void updateStatusMessage(QString);
+    void updateBoardBackground(QColor);
 
 };
 #endif // SOLONOBLE_H
