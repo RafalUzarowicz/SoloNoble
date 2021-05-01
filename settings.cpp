@@ -15,6 +15,7 @@ void Settings::setEuropean(bool isEuropean ){
         emit isEuropeanChanged(isEuropean);
     }
 }
+
 bool Settings::isEuropean(){
     return m_isEuropean;
 }
@@ -22,6 +23,7 @@ bool Settings::isEuropean(){
 QColor Settings::pawnColor(){
     return m_pawnColor;
 }
+
 void Settings::setPawnColor(QColor color){
     if(m_pawnColor != color){
         m_pawnColor = color;
@@ -32,18 +34,21 @@ void Settings::setPawnColor(QColor color){
 QColor Settings::boardColor(){
     return m_boardColor;
 }
+
 void Settings::setBoardColor(QColor color){
     if(m_boardColor != color){
         m_boardColor = color;
         emit boardColorChanged(color);
     }
 }
+
 void Settings::setPawnHighlightColor(QColor color){
     if(m_pawnHighlightColor != color){
         m_pawnHighlightColor = color;
         emit pawnHighlightColorChanged(color);
     }
 }
+
 QColor Settings::pawnHighlightColor(){
     return m_pawnHighlightColor;
 }
@@ -54,6 +59,7 @@ void Settings::setPawnMarkColor(QColor color){
         emit pawnMarkColorChanged(color);
     }
 }
+
 QColor Settings::pawnMarkColor(){
     return m_pawnMarkColor;
 }

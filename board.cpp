@@ -160,19 +160,10 @@ void Board::resetBoard(){
 }
 
 void Board::createPawnNeighbourhood(Tile* mainPawn, Tile* closePawn, Tile* farPawn){
-
-    mainPawn->m_closeNeighbours.emplace_back(closePawn);
-    mainPawn->m_farNeighbours.emplace_back(farPawn);
-
-    //    if(isHorizontal){
-//        connect(mainPawn, &Tile::startHighlightSetH, middlePawn, &Tile::checkHighlightPossibilityH);
-//        connect(middlePawn, &Tile::continueHighlightSetH, movePawn, &Tile::highlightTileH);
-//    }else{
-//        connect(mainPawn, &Tile::startHighlightSetV, middlePawn, &Tile::checkHighlightPossibilityV);
-//        connect(middlePawn, &Tile::continueHighlightSetV, movePawn, &Tile::highlightTileV);
-//    }
-//    connect(mainPawn, &Tile::markPossibleMoves, movePawn, &Tile::markMovePossibility);
-//    connect(mainPawn, &Tile::unmarkPossibleMoves, movePawn, &Tile::unmarkMovePossibility);
+    if(closePawn->isEnabled()){
+        mainPawn->m_closeNeighbours.emplace_back(closePawn);
+        mainPawn->m_farNeighbours.emplace_back(farPawn);
+    }
 }
 
 void Board::updateScore(){
@@ -228,34 +219,26 @@ void Board::setNeighboursConnection(){
         if(tempX>=0){
             closePawn = (Tile*)layout->itemAt(tempX + y*boardSize);
             farPawn = (Tile*)layout->itemAt(tempX+1 + y*boardSize);
-            if(closePawn->isEnabled()){
-                createPawnNeighbourhood(mainPawn, farPawn, closePawn);
-            }
+            createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
         tempX = x+2;
         if(tempX<boardSize){
             closePawn = (Tile*)layout->itemAt(tempX + y*7);
             farPawn = (Tile*)layout->itemAt(tempX-1 + y*boardSize);
-            if(closePawn->isEnabled()){
-                createPawnNeighbourhood(mainPawn, farPawn, closePawn);
-            }
+            createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
 
         tempY = y-2;
         if(tempY>=0){
             closePawn = (Tile*)layout->itemAt(x + tempY*7);
             farPawn = (Tile*)layout->itemAt(x + (tempY+1)*boardSize);
-            if(closePawn->isEnabled()){
-                createPawnNeighbourhood(mainPawn, farPawn, closePawn);
-            }
+            createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
         tempY = y+2;
         if(tempY<boardSize){
             closePawn = (Tile*)layout->itemAt(x + tempY*7);
             farPawn = (Tile*)layout->itemAt(x + (tempY-1)*boardSize);
-            if(closePawn->isEnabled()){
-                createPawnNeighbourhood(mainPawn, farPawn, closePawn);
-            }
+            createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
     }
 }
