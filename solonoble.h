@@ -9,6 +9,7 @@
 #include "boardview.h"
 #include "settingsdialog.h"
 #include "settings.h"
+#include "endgamedialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SoloNoble; }
@@ -27,11 +28,10 @@ private:
     Board* board;
     BoardView* boardView;
     SettingsDialog* settingsDialog;
+    EndGameDialog* endGameDialog;
 
 public slots:
     void updateScore(int);
-    void updateStatusMessage(QString);
     void updateBoardBackground(QColor);
-
 };
 #endif // SOLONOBLE_H

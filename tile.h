@@ -5,6 +5,7 @@
 #include <QGraphicsLayoutItem>
 #include <QPainter>
 #include <QVector>
+#include <QPropertyAnimation>
 
 class Board;
 
@@ -25,6 +26,10 @@ class Tile : public QObject, public QGraphicsItem, public QGraphicsLayoutItem
 
     Q_PROPERTY(QVector<Tile*> closeNeighbours READ closeNeighbours)
     Q_PROPERTY(QVector<Tile*> farNeighbours READ farNeighbours)
+
+    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
+    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 
 public:
     Tile(QColor = Qt::green, QGraphicsItem* = nullptr);
@@ -70,6 +75,8 @@ private:
 
     QVector<Tile*> m_closeNeighbours;
     QVector<Tile*> m_farNeighbours;
+
+    QPropertyAnimation* animation;
 };
 
 #endif // HOLE_H

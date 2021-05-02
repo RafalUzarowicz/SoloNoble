@@ -43,6 +43,9 @@ set(PROJECT_SOURCES
         settingsdialog.h
         settingsdialog.cpp
         settingsdialog.ui
+        endgamedialog.h
+        endgamedialog.cpp
+        endgamedialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

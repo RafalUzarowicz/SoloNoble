@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QColorDialog>
+#include <QPainter>
 
 #include "settings.h"
 

@@ -7,6 +7,32 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     currentSettings()
 {
     ui->setupUi(this);
+    // Setup window
+    setWindowTitle("Game settings");
+    QPixmap pixmap( 32, 32 );
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    QRect rect(14,0,4, 32);
+    QRect rect2(0,14,32, 4);
+    qreal angle = 45;
+    QPointF center = rect.center();
+    QTransform t = QTransform().translate( center.x(), center.y() ).rotate( angle ).translate( -center.x(), -center.y() );
+    QPolygon rotatedRect =  t.mapToPolygon( rect );
+    angle = -45;
+    center = rect.center();
+    t = QTransform().translate( center.x(), center.y() ).rotate( angle ).translate( -center.x(), -center.y() );
+    QPolygon rotatedRect2 =  t.mapToPolygon( rect );
+    painter.setBrush(Qt::black);
+    painter.drawRect(rect);
+    painter.drawRect(rect2);
+    painter.drawPolygon(rotatedRect);
+    painter.drawPolygon(rotatedRect2);
+    painter.drawEllipse(QRectF(4, 4, 24, 24));
+    painter.setBrush(Qt::white);
+    painter.drawEllipse(QRectF(7, 7, 18, 18));
+    painter.setBrush(Qt::black);
+    painter.drawEllipse(QRectF(10, 10, 12, 12));
+    setWindowIcon(QIcon(pixmap));
 
     // Setup dialog widgets
 

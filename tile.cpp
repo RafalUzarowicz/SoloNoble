@@ -1,5 +1,6 @@
 #include "tile.h"
 
+
 Tile::Tile(QColor pawnColor, QGraphicsItem *parent) :
     QGraphicsItem(parent),
     m_pawnColor(pawnColor),
@@ -15,10 +16,19 @@ Tile::Tile(QColor pawnColor, QGraphicsItem *parent) :
 
     setAcceptHoverEvents(true);
     setGraphicsItem(this);
+
+    animation = new QPropertyAnimation(this, "rotation");
+
+    animation->setDuration(10000);
+    animation->setStartValue(0.0);
+    animation->setEndValue(360);
+
+//    moveBy(1000, 1000);
+//    animation->start();
 }
 
 QRectF Tile::boundingRect() const {
-    return QRectF(0, 0, 100, 100);
+    return QRectF(-50, -50, 100, 100);
 }
 
 QPainterPath Tile::shape() const {
@@ -42,7 +52,7 @@ void Tile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
     }
     if(m_isOccupied){
         if(m_isSelected){
-            painter->setBrush(Qt::black);
+            painter->setBrush(QColor(255-m_pawnColor.red(), 255-m_pawnColor.green(), 255-m_pawnColor.blue(), 255));
             painter->drawEllipse(boundingRect());
         }
         painter->setBrush(m_pawnColor);
@@ -71,7 +81,7 @@ QSizeF Tile::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const{
 void Tile::setGeometry(const QRectF &geom){
     prepareGeometryChange();
     QGraphicsLayoutItem::setGeometry(geom);
-    setPos(geom.topLeft());
+    setPos(geom.center());
 }
 
 QVector<Tile*> Tile::closeNeighbours(){

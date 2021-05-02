@@ -27,7 +27,7 @@ public:
 signals:
     void clearSelection();
     void scoreChanged(int);
-    void sendGameStateMessage(QString);
+    void gameEnd(int);
 
 public slots:
     void selectNewTile(Tile*);
@@ -56,6 +56,8 @@ private:
     Settings m_boardSettings;
 
     Tile* selectedTile;
+
+    Tile* animationTile;
     int score;
 
     friend class SoloNoble;
