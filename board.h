@@ -21,13 +21,10 @@ class Board : public QGraphicsScene
     friend class SoloNoble;
 public:
     Board(int = 7);
-
-public:
     int getScore() const;
     void setScore(int);
 
 signals:
-    void clearSelection();
     void scoreChanged(int);
     void gameEnd(int);
 

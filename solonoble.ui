@@ -29,8 +29,8 @@
     <property name="title">
      <string>Game</string>
     </property>
-    <addaction name="actionNew_game"/>
-    <addaction name="action_Settings"/>
+    <addaction name="actionNewGame"/>
+    <addaction name="actionSettings"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -53,12 +53,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew_game"/>
-   <addaction name="action_Settings"/>
+   <addaction name="actionNewGame"/>
+   <addaction name="actionSettings"/>
    <addaction name="separator"/>
    <addaction name="actionExit"/>
   </widget>
-  <action name="actionNew_game">
+  <action name="actionNewGame">
    <property name="text">
     <string>&amp;New game</string>
    </property>
@@ -68,7 +68,7 @@
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="action_Settings">
+  <action name="actionSettings">
    <property name="text">
     <string>&amp;Settings</string>
    </property>

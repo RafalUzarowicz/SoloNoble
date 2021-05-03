@@ -30,6 +30,8 @@ private:
 
     Settings currentSettings;
 
+    static const int ICON_SIZE = 32;
+
 public slots:
     void setPawnColorView(QColor);
     void setBoardColorView(QColor);

@@ -21,6 +21,8 @@ public slots:
 
 private:
     Ui::EndGameDialog *ui;
+
+    static const int ICON_SIZE = 32;
 };
 
 #endif // ENDGAMEDIALOG_H

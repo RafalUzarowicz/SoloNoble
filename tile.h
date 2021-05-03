@@ -17,17 +17,17 @@ class Tile : public QObject, public QGraphicsItem, public QGraphicsLayoutItem
     Q_PROPERTY(QColor highlightColor WRITE setHighlightColor)
     Q_PROPERTY(QColor markColor WRITE setMarkColor)
 
-    Q_PROPERTY(bool isOccupied WRITE occupied READ isOccupied)
-    Q_PROPERTY(bool isSelected WRITE select READ isSelected)
-    Q_PROPERTY(bool isPossibleMove WRITE mark READ isPossibleMove)
-    Q_PROPERTY(bool isHighlighted WRITE highlight READ isHighlighted)
+    Q_PROPERTY(bool isOccupied WRITE occupied READ isOccupied NOTIFY isOccupiedChanged)
+    Q_PROPERTY(bool isSelected WRITE select READ isSelected NOTIFY isSelectedChanged)
+    Q_PROPERTY(bool isPossibleMove WRITE mark READ isPossibleMove NOTIFY isPossibleMoveChanged)
+    Q_PROPERTY(bool isHighlighted WRITE highlight READ isHighlighted NOTIFY isHighlightedChanged)
 
-    Q_PROPERTY(QVector<Tile*> closeNeighbours READ closeNeighbours)
-    Q_PROPERTY(QVector<Tile*> farNeighbours READ farNeighbours)
+    Q_PROPERTY(QVector<Tile*> closeNeighbours READ closeNeighbours NOTIFY closeNeighboursChanged)
+    Q_PROPERTY(QVector<Tile*> farNeighbours READ farNeighbours NOTIFY farNeighboursChanged)
 
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
-    Q_PROPERTY(QPointF pos READ pos WRITE setPos)
-    Q_PROPERTY(bool visible READ isVisible WRITE setVisible)
+    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
+    Q_PROPERTY(QPointF pos READ pos WRITE setPos NOTIFY posChanged)
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
 
 public:
     Tile(QColor = Qt::green, QGraphicsItem* = nullptr);
@@ -55,6 +55,18 @@ signals:
     void tileHoverChanged(bool);
     void tileSelected(Tile*);
     void emptyTileSelected(Tile*);
+
+    void isOccupiedChanged(bool);
+    void isSelectedChanged(bool);
+    void isPossibleMoveChanged(bool);
+    void isHighlightedChanged(bool);
+
+    void closeNeighboursChanged(QVector<Tile*>);
+    void farNeighboursChanged(QVector<Tile*>);
+
+    void opacityChanged(qreal);
+    void posChanged(QPointF);
+    void visibleChanged(bool);
 
 public slots:
     void setPawnColor(QColor);

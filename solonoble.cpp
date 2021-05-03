@@ -9,15 +9,15 @@ SoloNoble::SoloNoble(QWidget *parent)
     // Setup window
     setWindowTitle("Solo Noble");
 
-    QPixmap pixmap( 32, 32 );
+    QPixmap pixmap( ICON_SIZE, ICON_SIZE );
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setBrush(Qt::black);
     painter.setFont(QFont("Arial"));
     QFont font = painter.font();
-    font.setPixelSize(25);
+    font.setPixelSize(ICON_SIZE*2/3);
     painter.setFont(font);
-    painter.drawText(QRect(0, 0, 32, 32), Qt::AlignCenter, tr("SN"));
+    painter.drawText(QRect(0, 0, ICON_SIZE, ICON_SIZE), Qt::AlignCenter, tr("SN"));
     setWindowIcon(QIcon(pixmap));
 
     // Setup board scene
@@ -40,8 +40,8 @@ SoloNoble::SoloNoble(QWidget *parent)
     // Setup connections
     connect(board, &Board::scoreChanged, this, &SoloNoble::updateScore);
     connect(board, &Board::gameEnd, endGameDialog, &EndGameDialog::showEndGame);
-    connect(ui->action_Settings, &QAction::triggered, settingsDialog, &SettingsDialog::show);
-    connect(ui->actionNew_game, &QAction::triggered, board, &Board::resetBoardAnimation);
+    connect(ui->actionSettings, &QAction::triggered, settingsDialog, &SettingsDialog::show);
+    connect(ui->actionNewGame, &QAction::triggered, board, &Board::resetBoardAnimation);
 
     connect(&settingsDialog->currentSettings, &Settings::pawnColorChanged, &board->m_boardSettings, &Settings::setPawnColor);
     connect(&settingsDialog->currentSettings, &Settings::boardColorChanged, &board->m_boardSettings, &Settings::setBoardColor);

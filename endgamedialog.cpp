@@ -7,12 +7,12 @@ EndGameDialog::EndGameDialog(QWidget *parent) :
     ui->setupUi(this);
     // Setup window
     setWindowTitle("Game over!");
-    QPixmap pixmap( 32, 32 );
+    QPixmap pixmap( ICON_SIZE, ICON_SIZE );
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setBrush(Qt::red);
-    painter.drawLine(0, 0, 32, 32);
-    painter.drawLine(0, 32, 32, 0);
+    painter.drawLine(0, 0, ICON_SIZE, ICON_SIZE);
+    painter.drawLine(0, ICON_SIZE, ICON_SIZE, 0);
     setWindowIcon(QIcon(pixmap));
 }
 

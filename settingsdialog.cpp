@@ -9,11 +9,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
     // Setup window
     setWindowTitle("Game settings");
-    QPixmap pixmap( 32, 32 );
+    QPixmap pixmap( ICON_SIZE, ICON_SIZE );
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
-    QRect rect(14,0,4, 32);
-    QRect rect2(0,14,32, 4);
+    QRect rect(14,0,4, ICON_SIZE);
+    QRect rect2(0,14,ICON_SIZE, 4);
     qreal angle = 45;
     QPointF center = rect.center();
     QTransform t = QTransform().translate( center.x(), center.y() ).rotate( angle ).translate( -center.x(), -center.y() );

@@ -30,6 +30,8 @@ private:
     SettingsDialog* settingsDialog;
     EndGameDialog* endGameDialog;
 
+    static const int ICON_SIZE = 32;
+
 public slots:
     void updateScore(int);
     void updateBoardBackground(QColor);
