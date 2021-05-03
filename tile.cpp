@@ -103,19 +103,19 @@ void Tile::mark(bool isPossibleMove){
     update();
 }
 
-bool Tile::isOccupied(){
+bool Tile::isOccupied() const{
     return m_isOccupied;
 }
 
-bool Tile::isSelected(){
+bool Tile::isSelected() const{
     return m_isSelected;
 }
 
-bool Tile::isHighlighted(){
+bool Tile::isHighlighted() const{
     return m_isHighlighted;
 }
 
-bool Tile::isPossibleMove(){
+bool Tile::isPossibleMove() const{
     return m_isPossibleMove;
 }
 

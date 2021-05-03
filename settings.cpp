@@ -1,7 +1,6 @@
 #include "settings.h"
 
-Settings::Settings(QObject *parent) : QObject(parent)
-{
+Settings::Settings(QObject *parent) : QObject(parent){
     m_isEuropean = false;
     m_pawnColor = Qt::green;
     m_pawnHighlightColor = Qt::blue;
@@ -20,7 +19,7 @@ bool Settings::isEuropean(){
     return m_isEuropean;
 }
 
-QColor Settings::pawnColor(){
+QColor Settings::pawnColor() const{
     return m_pawnColor;
 }
 
@@ -31,7 +30,7 @@ void Settings::setPawnColor(QColor color){
     }
 }
 
-QColor Settings::boardColor(){
+QColor Settings::boardColor() const{
     return m_boardColor;
 }
 
@@ -49,7 +48,7 @@ void Settings::setPawnHighlightColor(QColor color){
     }
 }
 
-QColor Settings::pawnHighlightColor(){
+QColor Settings::pawnHighlightColor() const{
     return m_pawnHighlightColor;
 }
 
@@ -60,6 +59,6 @@ void Settings::setPawnMarkColor(QColor color){
     }
 }
 
-QColor Settings::pawnMarkColor(){
+QColor Settings::pawnMarkColor() const{
     return m_pawnMarkColor;
 }

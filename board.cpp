@@ -4,10 +4,9 @@ static QVariant bool_interpolator(const bool& from, const bool& to, qreal progre
     return progress < 0.5 ? from : to;
 }
 
-Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullptr),  score(0)
-{
+Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullptr),  score(0){
     // Create pawns
-    layout = new QGraphicsGridLayout;
+    boardLayout = new QGraphicsGridLayout;
     Tile* pawn{};
     int x{};
     int y{};
@@ -15,7 +14,7 @@ Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullpt
         x = i%boardSize;
         y = i/boardSize;
         pawn = new Tile();
-        layout->addItem(pawn, y, x);
+        boardLayout->addItem(pawn, y, x);
         connect(&m_boardSettings, &Settings::pawnColorChanged, pawn, &Tile::setPawnColor);
         connect(&m_boardSettings, &Settings::pawnHighlightColorChanged, pawn, &Tile::setHighlightColor);
         connect(&m_boardSettings, &Settings::pawnMarkColorChanged, pawn, &Tile::setMarkColor);
@@ -26,13 +25,13 @@ Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullpt
     initialBoard();
     setNeighboursConnection();
     // Widget used to store layout
-    form = new QGraphicsWidget;
-    form->setLayout(layout);
-    addItem(form);
-    form->adjustSize();
+    boardWidget = new QGraphicsWidget;
+    boardWidget->setLayout(boardLayout);
+    addItem(boardWidget);
+    boardWidget->adjustSize();
     // Animations tile
     animationTile = new Tile();
-    animationTile->setPos(((Tile*) layout->itemAt(0))->pos());
+    animationTile->setPos(((Tile*) boardLayout->itemAt(0))->pos());
     animationTile->setOpacity(0.0);
     animationTile->setEnabled(false);
     addItem(animationTile);
@@ -45,8 +44,7 @@ Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullpt
     qRegisterAnimationInterpolator<bool>(bool_interpolator);
 
     // Pawn moving
-    pawnMoveAnimation = new QSequentialAnimationGroup();
-    pawnMoveAnimation->setParent(this);
+    pawnMoveAnimation = new QSequentialAnimationGroup(this);
 
     animationTileShow = new QPropertyAnimation(animationTile, "opacity");
     animationTileShow->setDuration(0);
@@ -89,14 +87,14 @@ Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullpt
     animationTileHide->setEndValue(0.0);
     pawnMoveAnimation->addAnimation(animationTileHide);
 
-    connect(pawnMoveAnimation, &QSequentialAnimationGroup::finished, this, &Board::onAnimationEnd);
+    connect(pawnMoveAnimation, &QSequentialAnimationGroup::finished, this, &Board::onMoveAnimationEnd);
 
     // Board reset animation
-    hideAllPawns = new QParallelAnimationGroup();
-    showAllPawns = new QParallelAnimationGroup();
+    hideAllPawns = new QParallelAnimationGroup(this);
+    showAllPawns = new QParallelAnimationGroup(this);
     QPropertyAnimation* animation;
     for(int i{}; i<boardSize*boardSize; ++i){
-        pawn = (Tile*)layout->itemAt(i);
+        pawn = (Tile*)boardLayout->itemAt(i);
 
         animation = new QPropertyAnimation();
         animation->setTargetObject(pawn);
@@ -151,19 +149,19 @@ void Board::movePawn(Tile* targetPawn, Tile* middlePawn){
     sourcePawnRemove->setTargetObject(selectedTile);
     middlePawnRemove->setTargetObject(middlePawn);
     targetPawnAnimation->setTargetObject(targetPawn);
-    // Set new score
-    updateScore();
     // New marking
     selectedTile = targetPawn;
     // Start animations
     pawnMoveAnimation->start();
 }
 
-void Board::onAnimationEnd(){
+void Board::onMoveAnimationEnd(){
     if(selectedTile){
         selectedTile->select(true);
         markMoves(true);
     }
+    // Set new score
+    updateScore();
 }
 
 void Board::tryMovingPawn(Tile* emptySelectedTile){
@@ -228,7 +226,7 @@ void Board::initialBoard(){
     Tile* pawn = nullptr;
     // Setup pawns signals
     for(int i = 0; i<boardSize*boardSize; ++i){
-        pawn = (Tile*)layout->itemAt(i);
+        pawn = (Tile*)boardLayout->itemAt(i);
         connect(pawn, &Tile::tileSelected, this, &Board::selectNewTile);
         connect(pawn, &Tile::emptyTileSelected, this, &Board::tryMovingPawn);
         connect(pawn, &Tile::tileHoverChanged, this, &Board::highlightMoves);
@@ -254,7 +252,7 @@ void Board::resetBoard(){
     for(int i = 0; i<boardSize*boardSize; ++i){
         int x = i%boardSize;
         int y = i/boardSize;
-        pawn = (Tile*)layout->itemAt(i);
+        pawn = (Tile*)boardLayout->itemAt(i);
         if(isTileOnBoard(x, y)){
             ++score;
             pawn->setEnabled(true);
@@ -268,7 +266,7 @@ void Board::resetBoard(){
         }
     }
     // Remove middle pawn
-    pawn = (Tile*)layout->itemAt(boardSize*boardSize/2);
+    pawn = (Tile*)boardLayout->itemAt(boardSize*boardSize/2);
     pawn->occupied(false);
     --score;
     // Update view
@@ -289,6 +287,8 @@ void Board::updateScore(){
     emit scoreChanged(score);
     // Check end conditions
     if(isGameEnding()){
+        selectedTile->select(false);
+        selectedTile = nullptr;
         emit gameEnd(score);
     }
 }
@@ -299,7 +299,7 @@ bool Board::isGameEnding(){
     Tile* farPawn{};
     // Check if any pawn has any move
     for(int i = 0; i<boardSize*boardSize; ++i){
-        mainPawn = (Tile*)layout->itemAt(i);
+        mainPawn = (Tile*)boardLayout->itemAt(i);
         if(mainPawn->isEnabled()){
             for(int j{}; j<mainPawn->closeNeighbours().size(); ++j){
                 closePawn = mainPawn->closeNeighbours().at(j);
@@ -329,31 +329,31 @@ void Board::setNeighboursConnection(){
     for(int i = 0; i<boardSize*boardSize; ++i){
         x = i%boardSize;
         y = i/boardSize;
-        mainPawn = (Tile*)layout->itemAt(i);
+        mainPawn = (Tile*)boardLayout->itemAt(i);
 
         tempX = x-2;
         if(tempX>=0){
-            closePawn = (Tile*)layout->itemAt(tempX + y*boardSize);
-            farPawn = (Tile*)layout->itemAt(tempX+1 + y*boardSize);
+            closePawn = (Tile*)boardLayout->itemAt(tempX + y*boardSize);
+            farPawn = (Tile*)boardLayout->itemAt(tempX+1 + y*boardSize);
             createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
         tempX = x+2;
         if(tempX<boardSize){
-            closePawn = (Tile*)layout->itemAt(tempX + y*7);
-            farPawn = (Tile*)layout->itemAt(tempX-1 + y*boardSize);
+            closePawn = (Tile*)boardLayout->itemAt(tempX + y*7);
+            farPawn = (Tile*)boardLayout->itemAt(tempX-1 + y*boardSize);
             createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
 
         tempY = y-2;
         if(tempY>=0){
-            closePawn = (Tile*)layout->itemAt(x + tempY*7);
-            farPawn = (Tile*)layout->itemAt(x + (tempY+1)*boardSize);
+            closePawn = (Tile*)boardLayout->itemAt(x + tempY*7);
+            farPawn = (Tile*)boardLayout->itemAt(x + (tempY+1)*boardSize);
             createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
         tempY = y+2;
         if(tempY<boardSize){
-            closePawn = (Tile*)layout->itemAt(x + tempY*7);
-            farPawn = (Tile*)layout->itemAt(x + (tempY-1)*boardSize);
+            closePawn = (Tile*)boardLayout->itemAt(x + tempY*7);
+            farPawn = (Tile*)boardLayout->itemAt(x + (tempY-1)*boardSize);
             createPawnNeighbourhood(mainPawn, farPawn, closePawn);
         }
     }

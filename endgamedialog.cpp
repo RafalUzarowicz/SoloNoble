@@ -3,8 +3,7 @@
 
 EndGameDialog::EndGameDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::EndGameDialog)
-{
+    ui(new Ui::EndGameDialog){
     ui->setupUi(this);
     // Setup window
     setWindowTitle("Game over!");
@@ -17,13 +16,11 @@ EndGameDialog::EndGameDialog(QWidget *parent) :
     setWindowIcon(QIcon(pixmap));
 }
 
-EndGameDialog::~EndGameDialog()
-{
+EndGameDialog::~EndGameDialog(){
     delete ui;
 }
 
 void EndGameDialog::showEndGame(int score){
-    QString message = "Pawns left: "+QString::number(score);
-    ui->scoreLabel->setText(message);
+    ui->scoreLabel->setText(QString("Pawns left: ")+QString::number(score));
     show();
 }

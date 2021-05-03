@@ -94,6 +94,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 SettingsDialog::~SettingsDialog()
 {
     delete ui;
+    delete m_pawnColorDialog;
+    delete m_boardColorDialog;
+    delete m_highlightColorDialog;
+    delete m_markColorDialog;
 }
 
 void SettingsDialog::setPawnColorView(QColor color){

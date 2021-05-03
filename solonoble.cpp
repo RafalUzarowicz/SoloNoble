@@ -3,8 +3,8 @@
 
 SoloNoble::SoloNoble(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::SoloNoble)
-{
+    , ui(new Ui::SoloNoble){
+
     ui->setupUi(this);
     // Setup window
     setWindowTitle("Solo Noble");
@@ -12,7 +12,7 @@ SoloNoble::SoloNoble(QWidget *parent)
     QPixmap pixmap( 32, 32 );
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
-    painter.setBrush(Qt::blue);
+    painter.setBrush(Qt::black);
     painter.setFont(QFont("Arial"));
     QFont font = painter.font();
     font.setPixelSize(25);
@@ -54,11 +54,11 @@ SoloNoble::SoloNoble(QWidget *parent)
     updateScore(board->getScore());
 }
 
-SoloNoble::~SoloNoble()
-{
+SoloNoble::~SoloNoble(){
     delete ui;
     delete settingsDialog;
     delete endGameDialog;
+    delete board;
 }
 
 void SoloNoble::updateScore(int score){

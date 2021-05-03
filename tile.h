@@ -41,15 +41,16 @@ public:
     QVector<Tile*>& closeNeighbours();
     QVector<Tile*>& farNeighbours();
 
-    bool isOccupied();
-    bool isSelected();
-    bool isHighlighted();
-    bool isPossibleMove();
+    bool isOccupied() const;
+    bool isSelected() const;
+    bool isHighlighted() const;
+    bool isPossibleMove() const;
 
     void occupied(bool);
     void select(bool);
     void highlight(bool);
     void mark(bool);
+
 signals:
     void tileHoverChanged(bool);
     void tileSelected(Tile*);
@@ -64,8 +65,6 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent*) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent*) override;
     void mousePressEvent(QGraphicsSceneMouseEvent*) override;
-
-
 
 private:
     QColor m_pawnColor;

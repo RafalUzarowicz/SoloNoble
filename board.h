@@ -6,6 +6,7 @@
 #include <QGraphicsWidget>
 #include <QSequentialAnimationGroup>
 #include <QParallelAnimationGroup>
+
 #include "tile.h"
 #include "settings.h"
 
@@ -16,14 +17,13 @@ class Board : public QGraphicsScene
     Q_OBJECT
 
     Q_PROPERTY(int score READ getScore WRITE setScore NOTIFY scoreChanged)
-    Q_PROPERTY(Settings boardSettings)
+
+    friend class SoloNoble;
 public:
     Board(int = 7);
 
 public:
-
     int getScore() const;
-
     void setScore(int);
 
 signals:
@@ -42,7 +42,7 @@ public slots:
 
 private slots:
     void resetBoard();
-    void onAnimationEnd();
+    void onMoveAnimationEnd();
 
 private:
     void markMoves(bool);
@@ -51,13 +51,13 @@ private:
     void createPawnNeighbourhood(Tile*, Tile*, Tile*);
     bool isGameEnding();
     void movePawn(Tile*, Tile*);
+    void setNeighboursConnection();
+    bool isTileOnBoard(const int&, const int&);
 
     inline bool isMovePossible(Tile*, Tile*, Tile*) const;
 
-    QGraphicsGridLayout *layout;
-    QGraphicsWidget *form;
-    void setNeighboursConnection();
-    bool isTileOnBoard(const int&, const int&);
+    QGraphicsGridLayout* boardLayout;
+    QGraphicsWidget* boardWidget;
     int boardSize;
 
     Settings m_boardSettings;
@@ -81,8 +81,6 @@ private:
 
     QParallelAnimationGroup* hideAllPawns;
     QParallelAnimationGroup* showAllPawns;
-
-    friend class SoloNoble;
 };
 
 #endif // BOARD_H

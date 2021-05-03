@@ -19,17 +19,17 @@ public:
     void setEuropean(bool);
     bool isEuropean();
 
-    QColor pawnColor();
+    QColor pawnColor() const;
     void setPawnColor(QColor);
 
-    QColor boardColor();
+    QColor boardColor() const;
     void setBoardColor(QColor);
 
+    QColor pawnHighlightColor() const;
     void setPawnHighlightColor(QColor);
-    QColor pawnHighlightColor();
 
+    QColor pawnMarkColor() const;
     void setPawnMarkColor(QColor);
-    QColor pawnMarkColor();
 
 signals:
     void isEuropeanChanged(bool);
