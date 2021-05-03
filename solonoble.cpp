@@ -41,7 +41,7 @@ SoloNoble::SoloNoble(QWidget *parent)
     connect(board, &Board::scoreChanged, this, &SoloNoble::updateScore);
     connect(board, &Board::gameEnd, endGameDialog, &EndGameDialog::showEndGame);
     connect(ui->action_Settings, &QAction::triggered, settingsDialog, &SettingsDialog::show);
-    connect(ui->actionNew_game, &QAction::triggered, board, &Board::resetBoard);
+    connect(ui->actionNew_game, &QAction::triggered, board, &Board::resetBoardAnimation);
 
     connect(&settingsDialog->currentSettings, &Settings::pawnColorChanged, &board->m_boardSettings, &Settings::setPawnColor);
     connect(&settingsDialog->currentSettings, &Settings::boardColorChanged, &board->m_boardSettings, &Settings::setBoardColor);

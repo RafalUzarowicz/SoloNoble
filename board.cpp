@@ -1,5 +1,9 @@
 #include "board.h"
 
+static QVariant bool_interpolator(const bool& from, const bool& to, qreal progress){
+    return progress < 0.5 ? from : to;
+}
+
 Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullptr),  score(0)
 {
     // Create pawns
@@ -29,7 +33,8 @@ Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullpt
     // Animations tile
     animationTile = new Tile();
     animationTile->setPos(((Tile*) layout->itemAt(0))->pos());
-    animationTile->setVisible(false);
+    animationTile->setOpacity(0.0);
+    animationTile->setEnabled(false);
     addItem(animationTile);
 
     connect(&m_boardSettings, &Settings::pawnColorChanged, animationTile, &Tile::setPawnColor);
@@ -37,17 +42,79 @@ Board::Board(int size) : boardSize(size), m_boardSettings(), selectedTile(nullpt
     connect(&m_boardSettings, &Settings::pawnMarkColorChanged, animationTile, &Tile::setMarkColor);
 
     // Animations setup
+    qRegisterAnimationInterpolator<bool>(bool_interpolator);
 
+    // Pawn moving
+    pawnMoveAnimation = new QSequentialAnimationGroup();
+    pawnMoveAnimation->setParent(this);
 
-    /*
-     * 1. move animation pawn to selected pawn
-     * 2. make selected pawn invisible
-     * 3. move animation pawn to middle pawn
-     * 4. make middle pawn invisible
-     * 5. move animation pawn to target pawn
-     * 6. make target pawn visible
-     * 7. make animation pawn invisible
-     */
+    animationTileShow = new QPropertyAnimation(animationTile, "opacity");
+    animationTileShow->setDuration(0);
+    animationTileShow->setStartValue(0.0);
+    animationTileShow->setEndValue(1.0);
+    pawnMoveAnimation->addAnimation(animationTileShow);
+
+    sourcePawnRemove = new QPropertyAnimation();
+    sourcePawnRemove->setPropertyName("isOccupied");
+    sourcePawnRemove->setDuration(0);
+    sourcePawnRemove->setStartValue(true);
+    sourcePawnRemove->setEndValue(false);
+    pawnMoveAnimation->addAnimation(sourcePawnRemove);
+
+    movingAnimationToMiddle = new QPropertyAnimation(animationTile, "pos");
+    movingAnimationToMiddle->setDuration(100);
+    pawnMoveAnimation->addAnimation(movingAnimationToMiddle);
+
+    middlePawnRemove = new QPropertyAnimation();
+    middlePawnRemove->setPropertyName("isOccupied");
+    middlePawnRemove->setDuration(0);
+    middlePawnRemove->setStartValue(true);
+    middlePawnRemove->setEndValue(false);
+    pawnMoveAnimation->addAnimation(middlePawnRemove);
+
+    movingAnimationToTarget = new QPropertyAnimation(animationTile, "pos");
+    movingAnimationToTarget->setDuration(100);
+    pawnMoveAnimation->addAnimation(movingAnimationToTarget);
+
+    targetPawnAnimation = new QPropertyAnimation();
+    targetPawnAnimation->setDuration(0);
+    targetPawnAnimation->setPropertyName("isOccupied");
+    targetPawnAnimation->setStartValue(false);
+    targetPawnAnimation->setEndValue(true);
+    pawnMoveAnimation->addAnimation(targetPawnAnimation);
+
+    animationTileHide = new QPropertyAnimation(animationTile, "opacity");
+    animationTileHide->setDuration(0);
+    animationTileHide->setStartValue(1.0);
+    animationTileHide->setEndValue(0.0);
+    pawnMoveAnimation->addAnimation(animationTileHide);
+
+    connect(pawnMoveAnimation, &QSequentialAnimationGroup::finished, this, &Board::onAnimationEnd);
+
+    // Board reset animation
+    hideAllPawns = new QParallelAnimationGroup();
+    showAllPawns = new QParallelAnimationGroup();
+    QPropertyAnimation* animation;
+    for(int i{}; i<boardSize*boardSize; ++i){
+        pawn = (Tile*)layout->itemAt(i);
+
+        animation = new QPropertyAnimation();
+        animation->setTargetObject(pawn);
+        animation->setDuration(1000);
+        animation->setPropertyName("opacity");
+        animation->setStartValue(1.0);
+        animation->setEndValue(0.0);
+        hideAllPawns->addAnimation(animation);
+
+        animation = new QPropertyAnimation();
+        animation->setTargetObject(pawn);
+        animation->setDuration(1000);
+        animation->setPropertyName("opacity");
+        animation->setStartValue(0.0);
+        animation->setEndValue(1.0);
+        showAllPawns->addAnimation(animation);
+    }
+
 }
 
 int Board::getScore() const{
@@ -70,35 +137,43 @@ void Board::selectNewTile(Tile* newSelectedTile){
     selectedTile->select(true);
     markMoves(true);
     selectedTile->update();
+}
 
+void Board::movePawn(Tile* targetPawn, Tile* middlePawn){
+    // Remove old selection
+    selectedTile->select(false);
+    markMoves(false);
+    // Prepare animations
+    movingAnimationToMiddle->setStartValue(selectedTile->pos());
+    movingAnimationToMiddle->setEndValue(middlePawn->pos());
+    movingAnimationToTarget->setStartValue(middlePawn->pos());
+    movingAnimationToTarget->setEndValue(targetPawn->pos());
+    sourcePawnRemove->setTargetObject(selectedTile);
+    middlePawnRemove->setTargetObject(middlePawn);
+    targetPawnAnimation->setTargetObject(targetPawn);
+    // Set new score
+    updateScore();
+    // New marking
+    selectedTile = targetPawn;
+    // Start animations
+    pawnMoveAnimation->start();
+}
 
+void Board::onAnimationEnd(){
+    if(selectedTile){
+        selectedTile->select(true);
+        markMoves(true);
+    }
 }
 
 void Board::tryMovingPawn(Tile* emptySelectedTile){
     // Check if move is possible
-    Tile* pawn = emptySelectedTile;
     if(selectedTile){
         Tile* closeNeighbour{};
-        for(int i{}; i<selectedTile->m_closeNeighbours.size(); ++i){
-            closeNeighbour = selectedTile->m_closeNeighbours.at(i);
-            if(selectedTile->m_farNeighbours.at(i) == pawn && isMovePossible(selectedTile, closeNeighbour, pawn)){
-                // Remove old selection
-                selectedTile->select(false);
-                markMoves(false);
-                // Remove pawns
-                selectedTile->occupied(false);
-                selectedTile->update();
-                closeNeighbour->occupied(false);
-                closeNeighbour->update();
-                // Move pawn and select
-                selectedTile = pawn;
-                selectedTile->select(true);
-                selectedTile->occupied(true);
-                selectedTile->update();
-                // Set new score
-                updateScore();
-                // New marking
-                markMoves(true);
+        for(int i{}; i<selectedTile->closeNeighbours().size(); ++i){
+            closeNeighbour = selectedTile->closeNeighbours().at(i);
+            if(selectedTile->farNeighbours().at(i) == emptySelectedTile && isMovePossible(selectedTile, closeNeighbour, emptySelectedTile)){
+                movePawn(emptySelectedTile, closeNeighbour);
                 return;
             }
         }
@@ -109,10 +184,10 @@ void Board::highlightMoves(bool doHighlight){
     Tile* pawn = (Tile*)QObject::sender();
     if(pawn){
         Tile* pawnToHighlight{};
-        for (int i{}; i<pawn->m_closeNeighbours.size(); ++i) {
-            pawnToHighlight = pawn->m_farNeighbours.at(i);
+        for (int i{}; i<pawn->closeNeighbours().size(); ++i) {
+            pawnToHighlight = pawn->farNeighbours().at(i);
             // Highlight if move is possible
-            if(isMovePossible(pawn, pawn->m_closeNeighbours.at(i), pawnToHighlight)){
+            if(isMovePossible(pawn, pawn->closeNeighbours().at(i), pawnToHighlight)){
                 pawnToHighlight->highlight(doHighlight);
                 pawnToHighlight->update();
             }
@@ -123,10 +198,10 @@ void Board::highlightMoves(bool doHighlight){
 void Board::markMoves(bool doMark){
     if(selectedTile){
         Tile* pawnToHighlight{};
-        for (int i{}; i<selectedTile->m_closeNeighbours.size(); ++i) {
-            pawnToHighlight = selectedTile->m_farNeighbours.at(i);
+        for (int i{}; i<selectedTile->closeNeighbours().size(); ++i) {
+            pawnToHighlight = selectedTile->farNeighbours().at(i);
             // Mark if move is possible
-            if(isMovePossible(selectedTile, selectedTile->m_closeNeighbours.at(i), pawnToHighlight)){
+            if(isMovePossible(selectedTile, selectedTile->closeNeighbours().at(i), pawnToHighlight)){
                 pawnToHighlight->mark(doMark);
                 pawnToHighlight->update();
             }
@@ -162,6 +237,12 @@ void Board::initialBoard(){
     resetBoard();
 }
 
+void Board::resetBoardAnimation(){
+    hideAllPawns->start();
+    resetBoard();
+    showAllPawns->start();
+}
+
 void Board::resetBoard(){
     // Reset all pawns
     if(selectedTile){
@@ -191,15 +272,14 @@ void Board::resetBoard(){
     pawn->occupied(false);
     --score;
     // Update view
-    setBackgroundBrush(Qt::transparent);
     emit scoreChanged(score);
 }
 
 void Board::createPawnNeighbourhood(Tile* mainPawn, Tile* closePawn, Tile* farPawn){
     // Connect pawn with his neighbours
     if(closePawn->isEnabled()){
-        mainPawn->m_closeNeighbours.emplace_back(closePawn);
-        mainPawn->m_farNeighbours.emplace_back(farPawn);
+        mainPawn->closeNeighbours().emplace_back(closePawn);
+        mainPawn->farNeighbours().emplace_back(farPawn);
     }
 }
 
@@ -221,9 +301,9 @@ bool Board::isGameEnding(){
     for(int i = 0; i<boardSize*boardSize; ++i){
         mainPawn = (Tile*)layout->itemAt(i);
         if(mainPawn->isEnabled()){
-            for(int j{}; j<mainPawn->m_closeNeighbours.size(); ++j){
-                closePawn = mainPawn->m_closeNeighbours.at(j);
-                farPawn = mainPawn->m_farNeighbours.at(j);
+            for(int j{}; j<mainPawn->closeNeighbours().size(); ++j){
+                closePawn = mainPawn->closeNeighbours().at(j);
+                farPawn = mainPawn->farNeighbours().at(j);
                 if(isMovePossible(mainPawn, closePawn, farPawn)){
                     return false;
                 }
@@ -234,7 +314,7 @@ bool Board::isGameEnding(){
 }
 
 bool Board::isMovePossible(Tile* sourcePawn, Tile* middlePawn, Tile* targetPawn) const{
-    return sourcePawn->m_isOccupied && middlePawn->m_isOccupied && !targetPawn->m_isOccupied;
+    return sourcePawn->isOccupied() && middlePawn->isOccupied() && !targetPawn->isOccupied();
 }
 
 void Board::setNeighboursConnection(){
@@ -281,5 +361,5 @@ void Board::setNeighboursConnection(){
 
 void Board::changeBoardType(bool isEuropean){
     Q_UNUSED(isEuropean);
-    resetBoard();
+    resetBoardAnimation();
 }

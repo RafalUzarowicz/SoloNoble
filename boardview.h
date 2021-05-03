@@ -7,9 +7,6 @@ class BoardView : public QGraphicsView
 {
 public:
     BoardView(QWidget* = nullptr);
-
-    void zoomToFit();
-
 protected:
     void resizeEvent(QResizeEvent* event) override;
 };

@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsGridLayout>
 #include <QGraphicsWidget>
+#include <QSequentialAnimationGroup>
+#include <QParallelAnimationGroup>
 #include "tile.h"
 #include "settings.h"
 
@@ -34,9 +36,13 @@ public slots:
     void tryMovingPawn(Tile*);
     void highlightMoves(bool);
 
-    void resetBoard();
+    void resetBoardAnimation();
 
     void changeBoardType(bool);
+
+private slots:
+    void resetBoard();
+    void onAnimationEnd();
 
 private:
     void markMoves(bool);
@@ -44,6 +50,7 @@ private:
     void initialBoard();
     void createPawnNeighbourhood(Tile*, Tile*, Tile*);
     bool isGameEnding();
+    void movePawn(Tile*, Tile*);
 
     inline bool isMovePossible(Tile*, Tile*, Tile*) const;
 
@@ -59,6 +66,21 @@ private:
 
     Tile* animationTile;
     int score;
+
+    QSequentialAnimationGroup* pawnMoveAnimation;
+
+    QPropertyAnimation* sourcePawnRemove;
+    QPropertyAnimation* middlePawnRemove;
+    QPropertyAnimation* targetPawnAnimation;
+
+    QPropertyAnimation* animationTileShow;
+    QPropertyAnimation* animationTileHide;
+
+    QPropertyAnimation* movingAnimationToMiddle;
+    QPropertyAnimation* movingAnimationToTarget;
+
+    QParallelAnimationGroup* hideAllPawns;
+    QParallelAnimationGroup* showAllPawns;
 
     friend class SoloNoble;
 };

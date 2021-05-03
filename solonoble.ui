@@ -62,24 +62,15 @@
    <property name="text">
     <string>&amp;New game</string>
    </property>
-   <property name="shortcut">
-    <string>N</string>
-   </property>
   </action>
   <action name="actionExit">
    <property name="text">
     <string>&amp;Exit</string>
    </property>
-   <property name="shortcut">
-    <string>Esc</string>
-   </property>
   </action>
   <action name="action_Settings">
    <property name="text">
     <string>&amp;Settings</string>
-   </property>
-   <property name="shortcut">
-    <string>S</string>
    </property>
   </action>
  </widget>

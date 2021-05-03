@@ -16,15 +16,6 @@ Tile::Tile(QColor pawnColor, QGraphicsItem *parent) :
 
     setAcceptHoverEvents(true);
     setGraphicsItem(this);
-
-    animation = new QPropertyAnimation(this, "rotation");
-
-    animation->setDuration(10000);
-    animation->setStartValue(0.0);
-    animation->setEndValue(360);
-
-//    moveBy(1000, 1000);
-//    animation->start();
 }
 
 QRectF Tile::boundingRect() const {
@@ -64,48 +55,68 @@ void Tile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
     }
 }
 
-QSizeF Tile::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const{
+QSizeF Tile::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const{
     switch (which) {
         case Qt::MinimumSize:
-            return QSizeF(80,80);
+            return QSizeF(100,100);
         case Qt::PreferredSize:
             return QSizeF(100,100);
-            case Qt::MaximumSize:
-                return QSizeF(1000,1000);
+        case Qt::MaximumSize:
+            return QSizeF(100,100);
         default:
             break;
     }
     return constraint;
 }
 
-void Tile::setGeometry(const QRectF &geom){
+void Tile::setGeometry(const QRectF& geom){
     prepareGeometryChange();
     QGraphicsLayoutItem::setGeometry(geom);
     setPos(geom.center());
 }
 
-QVector<Tile*> Tile::closeNeighbours(){
+QVector<Tile*>& Tile::closeNeighbours(){
     return m_closeNeighbours;
 }
 
-QVector<Tile*> Tile::farNeighbours(){
+QVector<Tile*>& Tile::farNeighbours(){
     return m_farNeighbours;
 }
 
 void Tile::occupied(bool isOccupied){
     this->m_isOccupied = isOccupied;
+    update();
 }
 
 void Tile::select(bool isSelected){
     this->m_isSelected = isSelected;
+    update();
 }
 
 void Tile::highlight(bool isHighlighted){
     this->m_isHighlighted = isHighlighted;
+    update();
 }
 
 void Tile::mark(bool isPossibleMove){
     this->m_isPossibleMove = isPossibleMove;
+    update();
+}
+
+bool Tile::isOccupied(){
+    return m_isOccupied;
+}
+
+bool Tile::isSelected(){
+    return m_isSelected;
+}
+
+bool Tile::isHighlighted(){
+    return m_isHighlighted;
+}
+
+bool Tile::isPossibleMove(){
+    return m_isPossibleMove;
 }
 
 void Tile::hoverEnterEvent(QGraphicsSceneHoverEvent* e){

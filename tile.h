@@ -13,23 +13,21 @@ class Tile : public QObject, public QGraphicsItem, public QGraphicsLayoutItem
 {
     Q_OBJECT
 
-    friend Board;
-
     Q_PROPERTY(QColor pawnColor WRITE setPawnColor)
     Q_PROPERTY(QColor highlightColor WRITE setHighlightColor)
     Q_PROPERTY(QColor markColor WRITE setMarkColor)
 
-    Q_PROPERTY(bool isOccupied WRITE occupied)
-    Q_PROPERTY(bool isSelected WRITE select)
-    Q_PROPERTY(bool isPossibleMove WRITE mark)
-    Q_PROPERTY(bool isHighlighted WRITE highlight)
+    Q_PROPERTY(bool isOccupied WRITE occupied READ isOccupied)
+    Q_PROPERTY(bool isSelected WRITE select READ isSelected)
+    Q_PROPERTY(bool isPossibleMove WRITE mark READ isPossibleMove)
+    Q_PROPERTY(bool isHighlighted WRITE highlight READ isHighlighted)
 
     Q_PROPERTY(QVector<Tile*> closeNeighbours READ closeNeighbours)
     Q_PROPERTY(QVector<Tile*> farNeighbours READ farNeighbours)
 
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
-    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
     Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible)
 
 public:
     Tile(QColor = Qt::green, QGraphicsItem* = nullptr);
@@ -40,9 +38,18 @@ public:
     QSizeF sizeHint(Qt::SizeHint, const QSizeF& = QSizeF()) const override;
     void setGeometry(const QRectF&) override;
 
-    QVector<Tile*> closeNeighbours();
-    QVector<Tile*> farNeighbours();
+    QVector<Tile*>& closeNeighbours();
+    QVector<Tile*>& farNeighbours();
 
+    bool isOccupied();
+    bool isSelected();
+    bool isHighlighted();
+    bool isPossibleMove();
+
+    void occupied(bool);
+    void select(bool);
+    void highlight(bool);
+    void mark(bool);
 signals:
     void tileHoverChanged(bool);
     void tileSelected(Tile*);
@@ -58,10 +65,7 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent*) override;
     void mousePressEvent(QGraphicsSceneMouseEvent*) override;
 
-    void occupied(bool);
-    void select(bool);
-    void highlight(bool);
-    void mark(bool);
+
 
 private:
     QColor m_pawnColor;
@@ -75,8 +79,6 @@ private:
 
     QVector<Tile*> m_closeNeighbours;
     QVector<Tile*> m_farNeighbours;
-
-    QPropertyAnimation* animation;
 };
 
 #endif // HOLE_H
